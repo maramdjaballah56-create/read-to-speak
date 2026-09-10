@@ -1,0 +1,89 @@
+// prisma/schema.prisma
+// Run: npx prisma migrate dev --name init   (after setting DATABASE_URL)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String?
+  currentLevel  String   @default("A1")
+  xp            Int      @default(0)
+  streakDays    Int      @default(0)
+  lastActiveAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  progress      UserProgress[]
+  conversations ConversationLog[]
+  wordUsage     WordUsageEvent[]
+}
+
+model Unit {
+  id       String @id @default(cuid())
+  title    String
+  theme    String
+  level    String
+  category String
+  passage  String @db.Text
+
+  vocab         VocabWord[]
+  progress      UserProgress[]
+  conversations ConversationLog[]
+}
+
+model VocabWord {
+  id              String @id @default(cuid())
+  word            String
+  partOfSpeech    String
+  definition      String
+  exampleSentence String
+  unitId          String
+  unit            Unit   @relation(fields: [unitId], references: [id])
+}
+
+model UserProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  unitId     String
+  stage      String   @default("listen")
+  accuracy   Int      @default(0)
+  mastery    Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  unit Unit @relation(fields: [unitId], references: [id])
+
+  @@unique([userId, unitId])
+}
+
+model ConversationLog {
+  id         String   @id @default(cuid())
+  userId     String
+  unitId     String
+  transcript String   @db.Text
+  score      Int
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  unit Unit @relation(fields: [unitId], references: [id])
+}
+
+model WordUsageEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  word       String
+  count      Int      @default(0)
+  lastUsedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, word])
+}
