@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Flame, BookOpen, ChevronRight, Trophy } from "lucide-react";
+import Link from "next/link";
+import { Flame, ChevronRight, Trophy, BookOpen, Mic, MessageCircle } from "lucide-react";
 
 type Level = "A1" | "A2" | "B1" | "B2" | "C1";
 
@@ -23,6 +24,13 @@ const MOCK_UNITS: Unit[] = [
   { id: "u3", title: "The Fox Who Learned Patience", theme: "Children's story", level: "A1", category: "Story", progress: 20, minutes: 7 },
   { id: "u4", title: "Why Cities Flood", theme: "Climate & infrastructure", level: "B2", category: "Podcast", progress: 0, minutes: 18 },
   { id: "u5", title: "Negotiating a Raise", theme: "Workplace English", level: "C1", category: "Everyday", progress: 0, minutes: 16 },
+];
+
+const ACTIVITIES = [
+  { href: "/reading", icon: BookOpen, label: "Read a story", desc: "Tap words, listen, read aloud, answer questions" },
+  { href: "/stories", icon: BookOpen, label: "Story library", desc: "Browse all stories by level" },
+  { href: "/shadow", icon: Mic, label: "Repeat & pronounce", desc: "Shadow sentences and get corrected" },
+  { href: "/coach", icon: MessageCircle, label: "Talk to your coach", desc: "Practice a real conversation" },
 ];
 
 export default function Dashboard() {
@@ -53,7 +61,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-line bg-panel p-6 mb-10">
+        <div className="rounded-2xl border border-line bg-panel p-6 mb-8">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
             <div>
               <span className="rounded-full bg-purple-light px-2.5 py-1 text-xs font-medium text-purple-dark">
@@ -62,10 +70,32 @@ export default function Dashboard() {
               <h2 className="mt-3 text-xl font-semibold">{continueUnit.title}</h2>
               <p className="mt-1 text-sm text-muted">{continueUnit.theme}</p>
             </div>
-            <button className="flex items-center gap-2 rounded-lg bg-purple px-4 py-2.5 text-sm font-semibold text-white">
+            <Link
+              href="/reading"
+              className="flex items-center gap-2 rounded-lg bg-purple px-4 py-2.5 text-sm font-semibold text-white"
+            >
               Resume <ChevronRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
+        </div>
+
+        <h3 className="text-lg font-semibold mb-3">Activities</h3>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-10">
+          {ACTIVITIES.map((a) => (
+            <Link
+              key={a.href}
+              href={a.href}
+              className="flex items-center gap-3 rounded-xl border border-line bg-white p-4 hover:bg-panel transition-colors"
+            >
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-purple-light">
+                <a.icon className="h-5 w-5 text-purple-dark" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{a.label}</p>
+                <p className="text-xs text-muted">{a.desc}</p>
+              </div>
+            </Link>
+          ))}
         </div>
 
         <div className="flex gap-2 mb-4 flex-wrap">
@@ -87,9 +117,10 @@ export default function Dashboard() {
         <h3 className="text-lg font-semibold mb-3">Level {activeLevel} shelf</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {unitsForLevel.map((unit) => (
-            <button
+            <Link
               key={unit.id}
-              className="rounded-xl border border-line bg-white p-4 text-left hover:bg-panel transition-colors"
+              href="/reading"
+              className="rounded-xl border border-line bg-white p-4 text-left hover:bg-panel transition-colors block"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-wide text-muted">{unit.category}</span>
@@ -103,10 +134,11 @@ export default function Dashboard() {
                 </div>
                 <span className="text-[11px] text-muted">{unit.progress}%</span>
               </div>
-            </button>
+            </Link>
           ))}
         </div>
       </div>
     </div>
   );
 }
+                
